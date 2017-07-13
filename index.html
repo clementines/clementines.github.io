@@ -15,11 +15,38 @@
       <script>
       var myString = "Javascript is Cool!";
       console.log("D3plus and " + myString);
+
       var myArray = ["one", "two", "three", "four"];
       // Any line starting with double slashes is a comment
       // that will not be interpreted by the browser.
       // This should print out "two"
       console.log(myArray[1]);
+
+      var myObject = {
+        name: "Yuri",
+      color: "red"
+      };
+      console.log(myObject.name);
+
+      var sayHello = function() {
+        console.log("Hello!");
+      }
+      sayHello();
+
+      var sayText = function(txt) {
+        console.log(txt);
+      }
+      sayText("Goodbye");
+
+      var plusTen = function(num) {
+        return num + 10;
+      }
+      var thirty = plusTen(20);
+      console.log(thirty);
+
+      var myNumber = 20;
+      var bigNumber = myNumber > 100;
+      console.log(bigNumber);
       </script>
   </body>
 
