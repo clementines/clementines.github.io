@@ -29,7 +29,9 @@
                               <h1 class="Viz 1">Mental Health in the United States</h1>
                               <div class = "text">
                                 <div class = "sideText">
-                                  <p class="Viz 1">ipsum Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                                  <p class="Viz 1">The visual to the right depicts attributes with the strongest positive correlation with an increased number of mentally unhealthy days per month. The packed bubbles are color-coded to a health outcome or a lifestyle attribute - blue for health issue; red for lifestyle.
+                                    For example, there is a strong association between poor physical health days and poor mental health days. These are both health outcomes. Similarly, there is a strong relationship between adult smoking, a lifestyle attribute, and poor mental health. 
+These correlations indicate that health interventions related to mental health must consider both physical wellbeing as well as confounding lifestyle attributes.  </p>
                                 </div>
                                 <div id="viz"></div>
                                 <script>
@@ -48,8 +50,64 @@
                                 </script>
 
                               </div>
+
                               <h1 class="Viz 2">Mental Health Hurts Worker Productivity</h1>
-                              <p1 class="Viz 1">xxxxxxxxxxxxxxxxx</p1>
+                              <div class = "text">
+                                <div class = "sideText">
+                                  <p class="Viz 1">
+                                    The following scatterplot shows the different attributes in the visual above to poor mental health days. Each circle represents a different county in the United States. Each cirlce is colored based on the region in which the state resides - red, South; blue, West; green, Midwest; yellow, Northeast; orange, Mid-Atlantic.
+                                  </p>
+
+                                </div>
+                                <button id="poor_physical_health_days">Poor Physical Health</button>
+                                <button id="excessive_drinking">Excess Drinking</button>
+                                <button id="poor_or_fair_health">Poor Health</button>
+                                <button id="adult_smoking">Smokers</button>
+                                <button id="infant_mortality">Infant Mortality</button>
+                                <button id="high_school_graduation">HS Graduation</button>
+                                <button id="premature_death">Premature Death</button>
+                                <button id="premature_ageadjusted_mortality">Premature Mortality</button>
+                                <button id="social_associations">Socialness</button>
+                                <button id="homicide_rate">Murder Rate</button>
+                                <button id="unemployment">Unemployment</button>
+                                <button id="low_birthweight">Low Birthrate</button>
+                                <button id="preventable_hospital_stays">Preventable Hospital Stays</button>
+                                <button id="children_in_singleparent_households">Children in Single Parent Homes</button>
+                                <button id="injury_deaths">Injury Death</button>
+                                <button id="mean_commute_minutes_x">Commute Time</button>
+                                <button id="children_in_poverty">Children in Poverty</button>
+                                <button id="diabetes">Diabetes</button>
+                                <button id="motor_vehicle_crash_deaths">Car Crash Deaths</button>
+
+                                <div id="viz2"></div>
+
+                                <script>
+                                  // sample data array
+
+                                		  // instantiate d3plus
+                                		  var visualization = d3plus.viz()
+                                		    .container("#viz2")  // container DIV to hold the visualization
+                                		    .data("scatterdata.csv")  // data to use with the visualization
+                                				.size(10)
+                                		    .type("scatter")    // visualization type
+                                				.color("region")
+                                		    .id("county2")         // key for which our data is unique on
+                                		    .y("poor_mental_health_days")        // key for y-axis
+                                				.legend(false)
+
+                                	function draw(xValue) {
+                                		visualization.x(xValue).draw()
+                                	}
+
+                                	draw("poor_physical_health_days");
+
+                                	d3.selectAll("button").on("click", function() {
+                                		console.log(this)
+                                		draw(this.id);
+                                	});
+
+                                </script>
+                              </div>
                               <h1 class="Viz 3">Various Lifestyle Factors Impact Mental Health</h1>
                               <p1 class="Viz 1">xxxxxxxxxxxxxxxxx</p1>
                               <h1 class="Viz 4">Let's Explore Different Causes of Mental Health Illness</h1>
