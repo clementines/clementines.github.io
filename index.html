@@ -57,27 +57,27 @@ These correlations indicate that health interventions related to mental health m
                                   <p class="Viz 1">
                                     The following scatterplot shows the different attributes in the visual above to poor mental health days. Each circle represents a different county in the United States. Each cirlce is colored based on the region in which the state resides - red, South; blue, West; green, Midwest; yellow, Northeast; orange, Mid-Atlantic.
                                   </p>
-
+                                  <button id="poor_physical_health_days">Poor Physical Health</button>
+                                  <button id="excessive_drinking">Excess Drinking</button>
+                                  <button id="poor_or_fair_health">Poor Health</button>
+                                  <button id="adult_smoking">Smokers</button>
+                                  <button id="infant_mortality">Infant Mortality</button>
+                                  <button id="high_school_graduation">HS Graduation</button>
+                                  <button id="premature_death">Premature Death</button>
+                                  <button id="premature_ageadjusted_mortality">Premature Mortality</button>
+                                  <button id="social_associations">Socialness</button>
+                                  <button id="homicide_rate">Murder Rate</button>
+                                  <button id="unemployment">Unemployment</button>
+                                  <button id="low_birthweight">Low Birthrate</button>
+                                  <button id="preventable_hospital_stays">Preventable Hospital Stays</button>
+                                  <button id="children_in_singleparent_households">Children in Single Parent Homes</button>
+                                  <button id="injury_deaths">Injury Death</button>
+                                  <button id="mean_commute_minutes_x">Commute Time</button>
+                                  <button id="children_in_poverty">Children in Poverty</button>
+                                  <button id="diabetes">Diabetes</button>
+                                  <button id="motor_vehicle_crash_deaths">Car Crash Deaths</button>
                                 </div>
-                                <button id="poor_physical_health_days">Poor Physical Health</button>
-                                <button id="excessive_drinking">Excess Drinking</button>
-                                <button id="poor_or_fair_health">Poor Health</button>
-                                <button id="adult_smoking">Smokers</button>
-                                <button id="infant_mortality">Infant Mortality</button>
-                                <button id="high_school_graduation">HS Graduation</button>
-                                <button id="premature_death">Premature Death</button>
-                                <button id="premature_ageadjusted_mortality">Premature Mortality</button>
-                                <button id="social_associations">Socialness</button>
-                                <button id="homicide_rate">Murder Rate</button>
-                                <button id="unemployment">Unemployment</button>
-                                <button id="low_birthweight">Low Birthrate</button>
-                                <button id="preventable_hospital_stays">Preventable Hospital Stays</button>
-                                <button id="children_in_singleparent_households">Children in Single Parent Homes</button>
-                                <button id="injury_deaths">Injury Death</button>
-                                <button id="mean_commute_minutes_x">Commute Time</button>
-                                <button id="children_in_poverty">Children in Poverty</button>
-                                <button id="diabetes">Diabetes</button>
-                                <button id="motor_vehicle_crash_deaths">Car Crash Deaths</button>
+
 
                                 <div id="viz2"></div>
 
@@ -88,7 +88,7 @@ These correlations indicate that health interventions related to mental health m
                                 		  var visualization = d3plus.viz()
                                 		    .container("#viz2")  // container DIV to hold the visualization
                                 		    .data("scatterdata.csv")  // data to use with the visualization
-                                				.size(10)
+                                				.size(7)
                                 		    .type("scatter")    // visualization type
                                 				.color("region")
                                 		    .id("county2")         // key for which our data is unique on
@@ -108,12 +108,6 @@ These correlations indicate that health interventions related to mental health m
 
                                 </script>
                               </div>
-                              <h1 class="Viz 3">Various Lifestyle Factors Impact Mental Health</h1>
-                              <p1 class="Viz 1">xxxxxxxxxxxxxxxxx</p1>
-                              <h1 class="Viz 4">Let's Explore Different Causes of Mental Health Illness</h1>
-                              <p1 class="Viz 1">xxxxxxxxxxxxxxxxx</p1>
-
-
                       </div>
                </body>
 </html>

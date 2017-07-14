@@ -15,6 +15,10 @@ div#viz{
     display:inline-block;
     width: 60%;
 }
+div#viz2{
+    display:inline-block;
+    width: 60%;
+}
 
 h1 {
     color: #333;
