@@ -4,6 +4,125 @@ font-size: 32px;
 }
 element.style {
 }
+site.css?v=56:7023
+body.story #article-text {
+    background-color: #F6F6F6;
+    z-index: 1;
+    width: 100%;
+    padding: 25px 50px;
+    margin: 20px 0 0;
+}
+site.css?v=56:7014
+body.story #feature-text, body.story #article-text {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+site.css?v=56:8
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+}
+user agent stylesheet
+div {
+    display: block;
+}
+Inherited from body.story
+site.css?v=56:48
+body {
+    font-family: "Palanquin", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+}
+Pseudo ::before element
+site.css?v=56:7019
+body.story #feature-text:before, body.story #feature-text:after, body.story #article-text:before, body.story #article-text:after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+Pseudo ::after element
+site.css?v=56:7019
+body.story #feature-text:before, body.story #feature-text:after, body.story #article-text:before, body.story #article-text:after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+element.style {
+}
+site.css?v=56:7202
+body.story #article h1 {
+    color: #434958;
+    font-family: "Pathway Gothic One", sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-size: 64px;
+    line-height: 1;
+}
+site.css?v=56:7082
+body.story .post-titles h1 {
+    margin-bottom: 10px;
+}
+site.css?v=56:6932
+body.story h1 {
+    font-family: "Pathway Gothic One", sans-serif;
+    font-weight: 300;
+    font-size: initial;
+    line-height: 1.1;
+}
+site.css?v=56:3667
+body.profile h1, body.map h1, body.story h1 {
+    font-family: "Pathway Gothic One", sans-serif;
+    font-weight: 300;
+    font-size: 55px;
+    line-height: 1.1;
+}
+site.css?v=56:54
+h1 {
+    color: #132332;
+    font-family: "Pathway Gothic One", sans-serif;
+    font-weight: 300;
+    font-size: 60px;
+    line-height: 1.15;
+    text-transform: uppercase;
+    letter-spacing: -0.05em;
+    -webkit-font-smoothing: antialiased;
+    -moz-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+}
+site.css?v=56:8
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+}
+user agent stylesheet
+h1 {
+    display: block;
+    font-size: 2em;
+    -webkit-margin-before: 0.67em;
+    -webkit-margin-after: 0.67em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    font-weight: bold;
+}
+Inherited from body.story
+site.css?v=56:48
+body {
+    font-family: "Palanquin", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+}
+
+element.style {
+}
 site.css?v=56:7202
 body.story #article h1 {
     color: #434958;
