@@ -14,3 +14,21 @@ h1 {
     font-size: 64px;
     line-height: 1;
 }
+div.bg {
+  width: 1200px;
+  height: 900px;
+  display: block;
+  position: relative;
+}
+
+div.bg::after {
+  content: "";
+  background: url('http://s1.thingpic.com/images/nu/oFb2xuT9ArbVSjtmrNqBcbcf.jpeg');
+  opacity: 0.3;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: fixed;
+  z-index: -1;
+}
