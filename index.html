@@ -28,14 +28,10 @@
                  <div class="bg">
                               <h1 class="Viz 1">Mental Health in the United States</h1>
                               <div class = "text">
-                                <aside>
+                                <div class = "sideText">
                                   <p class="Viz 1">ipsum Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                                </aside>
-                                <div class ="viz_panel">
-                                  <div class="d3plus">
-                                    <div id="viz"></div>
-                                  </div>
                                 </div>
+                                <div id="viz"></div>
                                 <script>
                                   // instantiate d3plus
                                   var visualization = d3plus.viz()
@@ -45,7 +41,8 @@
                                     .id(["type", "name"]) // nesting keys
                                     .depth(50)              // 0-based depth
                                     .size("value")         // key name to size bubbles
-                                    .color("group")        // color by each group
+                                    .color("group")
+                                    .background("#F6F6F6")        // color by each group
                                     .draw()                // finally, draw the visualization!
                                 </script>
 
