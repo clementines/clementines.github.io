@@ -1,4 +1,4 @@
-body{
+div.text{
     background-color: #F6F6F6;
     z-index: 1;
     width: 100%;
@@ -6,7 +6,7 @@ body{
     margin: 20px 0 0;
 }
 h1 {
-    color: #434958;
+    color: #333;
     font-family: "Pathway Gothic One", sans-serif;
     font-weight: 400;
     text-transform: uppercase;
@@ -24,11 +24,30 @@ div.bg {
 div.bg::after {
   content: "";
   background: url('http://s1.thingpic.com/images/nu/oFb2xuT9ArbVSjtmrNqBcbcf.jpeg');
-  opacity: 0.3;
+  opacity: 0.4;
   top: 0;
   left: 0;
   bottom: 0;
   right: 0;
   position: fixed;
   z-index: -1;
+}
+
+p {
+    display: block;
+    -webkit-margin-before: 0;
+    -webkit-margin-after: 0;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+}
+body.story aside p {
+    margin: 3px 0 12px;
+    width: 100%;
+}
+body.story p {
+    color: rgba(51, 51, 51, 0.93);
+    font-family: "Palanquin", sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+    font-size: 16px;
 }
