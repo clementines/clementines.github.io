@@ -51,3 +51,22 @@ body.story p {
     font-weight: 400;
     font-size: 16px;
 }
+div.viz_panel{
+    flex: 1 0 auto;
+    margin-left: 50px;
+    min-height: 400px;
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
+}
+div.d3plus{
+    height: auto;
+    width: auto;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+    display: block;
+    font-family: "Palanquin", sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
