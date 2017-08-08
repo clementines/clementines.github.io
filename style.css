@@ -16,7 +16,7 @@ div#viz{
     width: 79%;
 }
 h1 {
-    color: #333;
+    color: #333333;
     font-family: "Pathway Gothic One", sans-serif;
     font-weight: 400;
     text-transform: uppercase;
@@ -24,6 +24,9 @@ h1 {
     font-size: 64px;
     line-height: 1;
     text-align: center;
+}
+h1#name {
+    color: #330000;
 }
 div.bg {
   position: relative;
