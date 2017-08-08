@@ -27,6 +27,7 @@ h1 {
 }
 h1#name {
     color: #330000;
+    font-size: 80px;
 }
 div.bg {
   position: relative;
