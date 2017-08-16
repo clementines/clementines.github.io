@@ -66,3 +66,6 @@ body.story p {
     margin: 0px 0 12px;
     width: 100%;
 }
+a {
+  text-decoration: none;
+}

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+               <meta charset="utf-8" />
+               <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+               <meta http-equiv="X-UA-Compatible" content="IE=edge">
+               <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+               <meta name="description" content="">
+               <meta property="og:title" content="Mental Health in the United States" />
+               <meta property="og:type" content="article" />
+               <meta property="og:image" content="http://2.bp.blogspot.com/-_d7_3ALafpg/URemWx6LdjI/AAAAAAAAB5s/OoOVkKCwveU/s1600/15482560-brain-pain-in-black.jpg" />
+               <meta property="og:description" content=""/>
+
+               <link href="https://fonts.googleapis.com/css?family=Pathway+Gothic+One" rel="stylesheet">
+               <link rel="stylesheet" href="style.css" />
+
+               <!-- Page title block -->
+               <title>GeoContour Visualization</title>
+
+               <script src="https://d3plus.org/js/d3plus.v2.0.0-alpha.13.full.min.js"></script>
+               <script src="https://d3js.org/d3.v4.min.js"></script>
+               <script src="//d3plus.org/js/d3.js"></script>
+               <script src="//d3plus.org/js/d3plus.js"></script>
+               <script src="https://unpkg.com/d3-contour@1"></script>
+               <script src="https://unpkg.com/d3-geo@1"></script>
+               <script src="https://unpkg.com/d3-timer@1"></script>
+               <script src="stack-blur.js"></script>
+
+</head>
+<canvas width="960" height="480" style="background-image:url(https://bl.ocks.org/mbostock/raw/818053c76d79d4841790c332656bf9da/cloud-fraction.png);background-size:cover;"></canvas>
+
+<script>
+
+var canvas = document.querySelector("canvas"),
+    context = canvas.getContext("2d");
+
+context.lineWidth = 2;
+context.lineJoin = "round";
+context.strokeStyle = "magenta";
+
+image("https://bl.ocks.org/mbostock/raw/818053c76d79d4841790c332656bf9da/cloud-fraction.png").then(function(image) {
+  var m = image.height,
+      n = image.width,
+      values = new Array(n * m),
+      contours = d3.contours().size([n, m]),
+      projection = d3.geoIdentity().scale(canvas.width / n),
+      path = d3.geoPath(projection, context);
+
+  StackBlur.R(image, 3);
+
+  for (var j = 0, k = 0; j < m; ++j) {
+    for (var i = 0; i < n; ++i, ++k) {
+      values[k] = image.data[(k << 2)] / 255;
+    }
+  }
+
+  d3.timer(function(t) {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.beginPath();
+    path(contours.thresholds([(t % 5000) / 5000])(values)[0]);
+    context.stroke();
+  });
+});
+
+function image(url) {
+  return new Promise(function(resolve) {
+    var image = new Image;
+    image.src = url;
+    image.onload = function() {
+      var canvas = document.createElement("canvas");
+      canvas.width = image.width;
+      canvas.height = image.height;
+      var context = canvas.getContext("2d");
+      context.drawImage(image, 0, 0);
+      resolve(context.getImageData(0, 0, image.width, image.height));
+    };
+  });
+}
+
+</script>
+</html>
