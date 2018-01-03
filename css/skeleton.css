@@ -389,13 +389,17 @@ div.bg::after {
     content: "";
     /* background: url('http://s1.thingpic.com/images/nu/oFb2xuT9ArbVSjtmrNqBcbcf.jpeg'); */
     background: url('https://defigo.co.uk/assets/img/defigo/server_room_blacktint.jpg');
-    opacity: 0.6;
+    opacity: 0.8;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
     position: fixed;
     z-index: -1;
+  }
+
+  a.noline {
+    text-decoration: none;
   }
 
 /* Clearing
