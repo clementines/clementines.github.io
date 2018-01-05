@@ -237,7 +237,8 @@ textarea,
 select {
   height: 38px;
   padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
-  background-color: #fff;
+  background-color: #666;
+  /* #fff */
   border: 1px solid #D1D1D1;
   border-radius: 4px;
   box-shadow: none;
@@ -251,9 +252,9 @@ input[type="tel"],
 input[type="url"],
 input[type="password"],
 textarea {
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none; }
+  -webkit-appearance: color = #999;
+     -moz-appearance: color = #999;
+          appearance: color = #999; }
 textarea {
   min-height: 65px;
   padding-top: 6px;
