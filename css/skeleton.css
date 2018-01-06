@@ -386,12 +386,12 @@ hr {
 div.bg {
       position: relative;
     }
-div.bg::after {
-    background-size: cover;
+div.bg:after {
+    background-size:cover;
     content: "";
-    /* background: url('http://s1.thingpic.com/images/nu/oFb2xuT9ArbVSjtmrNqBcbcf.jpeg'); */
-    background: url('https://defigo.co.uk/assets/img/defigo/server_room_blacktint.jpg');
-    opacity: 0.8;
+    /* background: url('http://s1.thingpic.com/images/nu/oFb2xuT9ArbVSjtmrNqBcbcf.jpeg');  */
+    background: url('../images/server_room_blacktint2.png');
+    opacity: 1;
     top: 0;
     left: 0;
     bottom: 0;
