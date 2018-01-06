@@ -387,11 +387,7 @@ div.bg {
       position: relative;
     }
 div.bg:after {
-<<<<<<< HEAD
     background-size:cover;
-=======
-    background-size:auto;
->>>>>>> 9f0ce1947e5e52f578ae2f897ff6d53d5e55997a
     content: "";
     /* background: url('http://s1.thingpic.com/images/nu/oFb2xuT9ArbVSjtmrNqBcbcf.jpeg');  */
     background: url('../images/server_room_blacktint2.png');
