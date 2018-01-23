@@ -41,7 +41,7 @@ print(rowTitle[1])
 print(rowValue[1])
 
 cryptoDF = pd.DataFrame(rowValue, index = rowTitle)
-
+print(cryptoDF)
 
 # DEVELOPMENT BELOW
 # # not able to pull content systematically - not handling list pointer correectly
