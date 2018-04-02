@@ -5,16 +5,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 #
 page = requests.get("https://finance.yahoo.com/cryptocurrencies/")
-page
+page.encoding
+page.text
+page.content
 page.status_code
 #page.content
 soup = BeautifulSoup(page.content, 'html.parser')
-allTables = soup.find_all('tbody')
-print(len(allTables))
+#allTables = soup.find_all('tbody')
+# print(len(allTables))
+# doesnt work because allTables is array or two-dimensional array
 # for index in allTables:
 #     print(index)
 mainTable = allTables[0]
-#print(mainTable.prettify())
+# print(mainTable.prettify())
 mainRows = mainTable.find_all('tr')
 print(len(mainRows))
 firstRow = mainRows[0]
@@ -60,6 +63,12 @@ print(rowValue[1])
 # print(rowChange[1][0])
 # print(rowChange[1][0].contents[4])
 print(str(rowChange[1][0].contents[1]) + str(rowChange[1][0].contents[4]))
+print(str(rowChange[0][0].contents[1]) + str(rowChange[0][0].contents[4]))
+print(str(rowChange[2][0].contents[1]) + str(rowChange[2][0].contents[4]))
+print(str(rowChange[3][0].contents[1]) + str(rowChange[3][0].contents[4]))
+print(str(rowChange[4][0].contents[1]) + str(rowChange[4][0].contents[4]))
+print(str(rowChange[5][0].contents[1]) + str(rowChange[5][0].contents[4]))
+print(str(rowChange[16][0].contents[1]) + str(rowChange[16][0].contents[4]))
 realRowChange = []
 for index in range(len(mainRows)):
     if(len(rowChange[0][0].contents) > 4):
