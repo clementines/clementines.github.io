@@ -89,7 +89,3 @@ with open(fp, "wb") as f:
 hre = pd.read_csv(fp)
 
 hre.head()
-
-
-# Miscellaneous
-"{name} wants to eat {food}".format(name="Bob", food="lasagna")
