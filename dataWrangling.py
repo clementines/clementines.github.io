@@ -4,43 +4,71 @@ from datetime import date, datetime
 import requests
 import re
 from bs4 import BeautifulSoup
-CryptoAPI = 'https://api.coinmarketcap.com/v1/ticker/'
-BTC_hist_link = 'https://coinmarketcap.com/currencies/bitcoin/historical-data/?start=20180401&end=20180416'
-r = requests.get(CryptoAPI)
-r2 = requests.get(BTC_hist_link)
-soup = BeautifulSoup(r2.content, 'html.parser')
-soup
-r.headers
-r2.headers
-cmcjson = r.json()
-r2.content
-testHistRows = soup.find_all('tr')
-testHistRows
-header = testHistRows[0]
-header.contents
-headerCol = header.find_all('th')
-headerCol
-headerCol[0].contents
 
-# create a dataframe with live crypto values for top 100 coin
-def resetCoinDF():
-    toReturn = pd.read_json(CryptoAPI, orient='records')
-    toReturn.set_index('symbol', inplace=True)
-    return toReturn
-def
+# CRYPTO data pull #################################
+# flatten list of lists into a list
+def flatten(l):
+    lists_of_lists = l
+    flattened = [val for sublist in lists_of_lists for val in sublist]
+    return flattened
+# create a dataframe with CURRENT crypto values for top 100
+def liveCoin():
+    liveCryptoAPI = 'https://api.coinmarketcap.com/v1/ticker/'
+    r = requests.get(liveCryptoAPI)
+    returnMeta = r.headers
+    returnDF = pd.read_json(CryptoAPI, orient='records')
+    returnDF.set_index('symbol', inplace=True)
+    return {'df':returnDF, 'meta':returnMeta}
+# create a historical by-day panel with a dateframe for each coin
+# startdate should by YYYYMMDD string
+def HistCoin(startDate):
+    today = date.today()
+    todayString = t.strftime('%Y%m%d')
+    BTC_hist_link = 'https://coinmarketcap.com/currencies/bitcoin/historical-data/?start='+startDate+'&end='+todayString
+    r = requests.get(BTC_hist_link)
+    returnMeta = r.headers
+    soup = BeautifulSoup(r.content, 'html.parser')
+    histTableHTML = soup.find_all('tr')
+    headerHTML = histTableHTML[0]
+    headerColHTML = headerHTML.find_all('th')
+    returnHeaders = []
+    for x in headerColHTML:
+        returnHeaders.append(x.contents)
+    returnHeaders = flatten(returnHeaders)
+    numRows = len(histTableHTML)
+    rowsHTML = histTableHTML[1:numRows]
+    returnRows = []
+    for x in rowsHTML:
+        cols = []
+        colsHTML = x.find_all('td')
+        for y in x.find_all('td'):
+            cols.append(y.contents)
+        colsFlatten = flatten(cols)
+        returnRows.append(colsFlatten)
+    returnDF = pd.DataFrame(returnRows, columns=returnHeaders)
+    return {'df':returnDF, 'meta':returnMeta}
+
+# main execution
+cmcLive = liveCoin()
+cmcLive['meta']
+cmcLive['df']
+cmcHist = HistCoin('20140101')
+cmcHist['meta']
+cmcHist['df']
+
+cmc.describe()
+cmc.dtypes
+
+# PANDAS MISC #################################
 # create 4 by 4 matrix with random numbers
-def resetDF():
+def randTSDF():
     dates = pd.date_range('20180101', periods=4)
     featureNames = list('ABCD')
     return pd.DataFrame(np.random.randn(4,4), index=dates, columns=featureNames)
 
-df = resetDF()
-df
-cmc = resetCoinDF()
-cmc
-cmc.describe()
-cmc.dtypes
 # to numpy 2-d array
+df = randTSDF()
+df
 df.values
 # axis 1 is column header, descending: ascending=False
 df.sort_index(axis=0, ascending=True)
