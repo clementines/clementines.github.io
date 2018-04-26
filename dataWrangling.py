@@ -16,14 +16,14 @@ def liveCoin():
     r = requests.get(liveCryptoAPI)
     meta = r.headers
     returnMeta = pd.DataFrame([meta]).T
-    returnDF = pd.read_json(CryptoAPI, orient='records')
+    returnDF = pd.read_json(liveCryptoAPI, orient='records')
     returnDF.set_index('symbol', inplace=True)
     return {'df':returnDF, 'meta':returnMeta}
 # create a historical by-day panel with a dateframe for each coin
 # startdate should by YYYYMMDD string
 def histCoin(startDate):
     today = date.today()
-    todayString = t.strftime('%Y%m%d')
+    todayString = today.strftime('%Y%m%d')
     BTC_hist_link = 'https://coinmarketcap.com/currencies/bitcoin/historical-data/?start='+startDate+'&end='+todayString
     r = requests.get(BTC_hist_link)
     meta = r.headers
@@ -47,12 +47,18 @@ def histCoin(startDate):
         colsFlatten = flatten(cols)
         returnRows.append(colsFlatten)
     returnDF = pd.DataFrame(returnRows, columns=returnHeaders)
+    def cleanDate(row):
+        return datetime.strptime(row['Date'].replace(',',''),'%b %d %Y')
+    returnDF['Date'] = returnDF.apply(cleanDate, axis=1)
+    returnDF = returnDF.set_index('Date')
     return {'df':returnDF, 'meta':returnMeta}
 # main execution
 cmcLive = liveCoin()
-# cmcLive['meta']
+cmcLive['df']
 cmcHist = histCoin('20140101')
-# cmcHist['meta']
+cmcHist['df'].dtypes
+workingDF = cmcHist['df']
+
 writer = pd.ExcelWriter('cryptoOutput.xlsx')
 cmcLive['df'].to_excel(writer, 'live')
 cmcHist['df'].to_excel(writer, 'hist')
@@ -75,6 +81,7 @@ def randTSDF():
 # to numpy 2-d array
 df = randTSDF()
 df
+df.index
 df.values
 # axis 1 is column header, descending: ascending=False
 df.sort_index(axis=0, ascending=True)
