@@ -4,14 +4,21 @@ from datetime import date, datetime
 import requests
 import re
 from bs4 import BeautifulSoup
-# CRYPTO data pull #################################
-# flatten list of lists into a list
+import pandas.io.formats.excel
+
+# Pandas Utility Functions #####################################
 def flatten(l):
+    # flatten list of lists into a list
     lists_of_lists = l
     flattened = [val for sublist in lists_of_lists for val in sublist]
     return flattened
-# create a dataframe with CURRENT crypto values for top 100
+# Apply function - on columns
+def cleanDate(row):
+    # removes comma from string 'Date' field casts into date type
+    return datetime.strptime(row['Date'].replace(',',''),'%b %d %Y')
+# CRYPTO data pull #################################
 def liveCoin():
+    # create a dataframe with CURRENT crypto values for top 100
     liveCryptoAPI = 'https://api.coinmarketcap.com/v1/ticker/'
     r = requests.get(liveCryptoAPI)
     meta = r.headers
@@ -19,9 +26,9 @@ def liveCoin():
     returnDF = pd.read_json(liveCryptoAPI, orient='records')
     returnDF.set_index('symbol', inplace=True)
     return {'df':returnDF, 'meta':returnMeta}
-# create a historical by-day panel with a dateframe for each coin
-# startdate should by YYYYMMDD string
 def histCoin(startDate):
+    # create a historical by-day panel with a dateframe for each coin
+    # startdate should by YYYYMMDD string
     today = date.today()
     todayString = today.strftime('%Y%m%d')
     BTC_hist_link = 'https://coinmarketcap.com/currencies/bitcoin/historical-data/?start='+startDate+'&end='+todayString
@@ -47,24 +54,61 @@ def histCoin(startDate):
         colsFlatten = flatten(cols)
         returnRows.append(colsFlatten)
     returnDF = pd.DataFrame(returnRows, columns=returnHeaders)
-    def cleanDate(row):
-        return datetime.strptime(row['Date'].replace(',',''),'%b %d %Y')
     returnDF['Date'] = returnDF.apply(cleanDate, axis=1)
     returnDF = returnDF.set_index('Date')
     return {'df':returnDF, 'meta':returnMeta}
-# main execution
+# main execution ###############################################
 cmcLive = liveCoin()
 cmcLive['df']
 cmcHist = histCoin('20140101')
-cmcHist['df'].dtypes
-workingDF = cmcHist['df']
+cmcHist['df']
 
-writer = pd.ExcelWriter('cryptoOutput.xlsx')
-cmcLive['df'].to_excel(writer, 'live')
-cmcHist['df'].to_excel(writer, 'hist')
-cmcLive['meta'].to_excel(writer, 'liveMeta')
-cmcHist['meta'].to_excel(writer, 'histMeta')
-writer.save()
+writerSimple = pd.ExcelWriter('simpleCryptoOutput.xlsx')
+cmcLive['df'].to_excel(writerSimple, 'live')
+cmcHist['df'].to_excel(writerSimple, 'hist')
+cmcLive['meta'].to_excel(writerSimple, 'liveMeta')
+cmcHist['meta'].to_excel(writerSimple, 'histMeta')
+writerSimple.save()
+
+pandas.io.formats.excel.header_style = None
+writerFancy = pd.ExcelWriter('fancyCryptoOutput.xlsx', engine='xlsxwriter',datetime_format='mm/dd/yy',
+        date_format='mm/dd/yy')
+cmcLive['df'].rename(columns=lambda x: x.replace('_', ' '), inplace=True)
+cmcLive['df'].to_excel(writerFancy, 'live')
+cmcHist['df'].to_excel(writerFancy, 'hist')
+cmcLive['meta'].to_excel(writerFancy, 'liveMeta')
+cmcHist['meta'].to_excel(writerFancy, 'histMeta')
+workbook = writerFancy.book
+text_fmt = workbook.add_format({'bold': True, 'text_wrap': True})
+fiat_fmt = workbook.add_format({'num_format': '$#,##0'})
+num_fmt = workbook.add_format({'num_format': '#,##0'})
+fiatDec_fmt = workbook.add_format({'num_format': '$#,###.00'})
+numDec_fmt = workbook.add_format({'num_format': '#,###.000000'})
+worksheet = writerFancy.sheets['live']
+worksheet.set_column('B:B', 15, fiat_fmt)
+worksheet.set_column('C:C', 16, num_fmt)
+worksheet.set_column('F:F', 17, fiat_fmt)
+worksheet.set_column('G:G', 18, num_fmt)
+worksheet.set_column('H:H', 20)
+worksheet.set_column('L:L', 8, numDec_fmt)
+worksheet.set_column('M:M', 9, fiatDec_fmt)
+worksheet.set_column('O:O', 18, num_fmt)
+worksheet.set_column('A:A', 7, text_fmt)
+worksheet.set_row(0, None, text_fmt)
+worksheet.freeze_panes('A2')
+worksheet = writerFancy.sheets['hist']
+worksheet.set_column('B:E', 8, fiatDec_fmt)
+worksheet.set_column('F:G', 14, fiat_fmt)
+worksheet.set_column('A:A', 7, text_fmt)
+worksheet.set_row(0, None, text_fmt)
+worksheet.freeze_panes('A2')
+writerFancy.save()
+
+# dateFormat = workbook.add_format({'num_format': 'dd/mm/yy'})
+# worksheet.write('A2', number, format2)       # 28/02/13
+
+
+
 
 cmcLive['df'].describe()
 cmcLive['df'].dtypes
