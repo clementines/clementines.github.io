@@ -1,3 +1,6 @@
+import timeit
+start = timeit.default_timer()
+
 import pandas as pd
 import numpy as np
 from datetime import date, datetime
@@ -46,32 +49,41 @@ def liveCoin():
     r = requests.get(liveCryptoAPI)
     meta = r.headers
     returnMeta = pd.DataFrame([meta]).T
+    print('converting json to dataframe')
     returnDF = pd.read_json(liveCryptoAPI, orient='records')
     returnDF.set_index('symbol', inplace=True)
+    print('saving live coin data')
     return {'df':returnDF, 'meta':returnMeta}
-def histCoin(startDate):
+def histCoin(startDate,coinList):
     # create a historical by-day panel with a dateframe for each coin
     # startdate should be YYYYMMDD string
     today = date.today()
     todayString = today.strftime('%Y%m%d')
-    BTC_hist_link = 'https://coinmarketcap.com/currencies/bitcoin/historical-data/?start='+startDate+'&end='+todayString
-    r = requests.get(BTC_hist_link)
-    meta = r.headers
-    returnMeta = pd.DataFrame([meta]).T
-    soup = BeautifulSoup(r.content, 'html.parser')
-    returnDF = parseHTMLTable(soup)
-
-    returnDF['Date'] = returnDF.apply(cleanDate, axis=1)
-    returnDF['Volume'] = returnDF.apply(noComma1, axis=1)
-    returnDF['Market Cap'] = returnDF.apply(noComma2, axis=1)
-    returnDF['Open'] = pd.to_numeric(returnDF['Open'])
-    returnDF['High'] = pd.to_numeric(returnDF['High'])
-    returnDF['Low'] = pd.to_numeric(returnDF['Low'])
-    returnDF['Close'] = pd.to_numeric(returnDF['Close'])
-    returnDF['Volume'] = pd.to_numeric(returnDF['Volume'])
-    returnDF['Market Cap'] = pd.to_numeric(returnDF['Market Cap'])
-    returnDF = returnDF.set_index('Date')
-    return {'df':returnDF, 'meta':returnMeta}
+    returnDFList = []
+    for x in coinList:
+        print('scraping '+x+ ' historical')
+        coin_hist_link = 'https://coinmarketcap.com/currencies/'+x+'/historical-data/?start='+startDate+'&end='+todayString
+        r = requests.get(coin_hist_link)
+        meta = r.headers
+        returnMeta = pd.DataFrame([meta]).T
+        soup = BeautifulSoup(r.content, 'html.parser')
+        returnDF = parseHTMLTable(soup)
+        returnDF['Date'] = returnDF.apply(cleanDate, axis=1)
+        returnDF['Volume'] = returnDF.apply(noComma1, axis=1)
+        returnDF['Market Cap'] = returnDF.apply(noComma2, axis=1)
+        returnDF['Open'] = pd.to_numeric(returnDF['Open'])
+        returnDF['High'] = pd.to_numeric(returnDF['High'])
+        returnDF['Low'] = pd.to_numeric(returnDF['Low'])
+        returnDF['Close'] = pd.to_numeric(returnDF['Close'])
+        returnDF['Volume'] = pd.to_numeric(returnDF['Volume'])
+        returnDF['Market Cap'] = pd.to_numeric(returnDF['Market Cap'], errors='coerce')
+        returnDF['CoinID'] = x
+        returnDF = returnDF.set_index(['Date','CoinID'])
+        print('saving '+x+ ' historical')
+        returnDFList.append(returnDF)
+    print('combining all historical')
+    returnDFconcat = pd.concat(returnDFList)
+    return {'df':returnDFconcat, 'meta':returnMeta}
 def writeSimpleExcel(cmcLive, cmcHist):
     writer = pd.ExcelWriter('simpleCryptoOutput.xlsx')
     cmcLive['df'].to_excel(writer, 'live values')
@@ -131,8 +143,8 @@ def applyExcelFormat(writer, live, hist):
                                                'format': format1})
     # apply format on historical values
     worksheet = writer.sheets[hist]
-    worksheet.set_column('B:E', 8, fiatDec_fmt)
-    worksheet.set_column('F:G', 14, fiat_fmt)
+    worksheet.set_column('C:F', 8, fiatDec_fmt)
+    worksheet.set_column('G:H', 14, fiat_fmt)
     worksheet.set_column('A:A', 7, text_fmt)
     worksheet.set_row(0, None, text_fmt)
     worksheet.freeze_panes('A2')
@@ -151,15 +163,21 @@ def writeExcel(cmcLive, cmcHist):
     print('CryptoOutput.xlsx')
 # main execution ###############################################
 # run api pull and save as cmcLive
+print('begin live API pull for top 100 coins')
 cmcLive = liveCoin()
-cmcLive['df'].dtypes
+coinList = cmcLive['df'].id.tolist()
 # run webscrape pull and save as cmcLive
-cmcHist = histCoin('20140101')
-cmcHist['df'].dtypes
+hist_start_date = '20140401'
+print('begin historical scrape from ',hist_start_date)
+cmcHist = histCoin(hist_start_date,coinList)
+cmcHist['df'].index
 num_rows_Live = len(cmcLive['df'].index)
 num_rows_Hist = len(cmcHist['df'].index)
+num_coins_Hist = len(coinList)
 print('Live values: ',num_rows_Live, ' Coins')
-print('Historical values: ',num_rows_Hist, ' Days')
+print('Historical values: ',num_rows_Hist, ' Days for ',num_coins_Hist,' Coins')
 # create formatted excel workbooks of data
 writeSimpleExcel(cmcLive,cmcHist)
 writeExcel(cmcLive,cmcHist)
+stop = timeit.default_timer()
+print(stop-start,' seconds')
