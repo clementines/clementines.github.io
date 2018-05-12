@@ -41,6 +41,12 @@ def noComma2(row): # remove comma from column 'Market Cap'
     return row['Market Cap'].replace(',','')
 def cleanDate(row): # remove comma from string 'Date' field - cast as Date
     return datetime.strptime(row['Date'].replace(',',''),'%b %d %Y')
+def prior_1h(row):
+    return row['price_usd']/((100 - row['percent_change_1h'])/100)
+def prior_24h(row):
+    return row['price_usd']/((100 - row['percent_change_24h'])/100)
+def prior_7d(row):
+    return row['price_usd']/((100 - row['percent_change_7d'])/100)
 def applyExcelFormat(writer, live, hist, n_rows_live, n_rows_hist): # add and
         # apply formats to excel
     # create formats
@@ -176,3 +182,53 @@ stop = timeit.default_timer()
 print(stop-start,' seconds for intialization')
 
 # next steps - update live values continuously while spreadsheet is open
+    # from openpyxl import Workbook
+    # from openpyxl import load_workbook
+    # wb = load_workbook('CryptoOutput.xlsx')
+    # print(wb.get_sheet_names())
+    # ws1 = wb.get_sheet_by_name('live values')
+    # ws1
+    # ws1['P2'] = 0.00
+    # wb.save('CryptoOutput.xlsx')
+
+# next steps - plotting delta with Bokeh - run every 60 seconds
+from bokeh.layouts import column,row
+from bokeh.plotting import figure, show, output_file
+from bokeh.models import NumeralTickFormatter,LinearColorMapper, BasicTicker, ColorBar
+import time
+print('beginning live chart update every 60 seconds')
+starttime=time.time()
+while True: # run every 60 seconds
+    newLive = liveCoin()
+
+    # volume graph
+    factors = newLive['df'].index.tolist()[0:10]
+    x = newLive['df']['24h_volume_usd'].tolist()[0:10]
+    factors.reverse()
+    x.reverse()
+    dot = figure(title="24 Hour Volume for Top 10 Market Cap Coins", tools="hover", toolbar_location=None,
+                y_range=factors, x_range=[0,max(x)])
+    dot.segment(0, factors, x, factors, line_width=2, line_color="green", )
+    dot.circle(x, factors, size=15, fill_color="orange", line_color="green", line_width=3, )
+    # dot.ticker = SingleIntervalTicker(interval=max(x)/5, num_minor_ticks=5)
+    dot.xaxis[0].formatter = NumeralTickFormatter(format='($ 0.00 a)')
+
+    # delta graph
+    yfactors = newLive['df'].loc[:,'percent_change_1h':'percent_change_7d'][0:10].index.tolist()
+    yfactors.reverse()
+    xfactors = ['Last Hour','Last 24 Hours','Last 7 Days']
+
+    data = np.flipud(newLive['df'].loc[:,'percent_change_1h':'percent_change_7d'][0:10].values)
+    color_mapper = LinearColorMapper(palette="Viridis256", low=np.amin(data), high=np.amax(data))
+    plot = figure(title="Percent Change for Top 10 Market Cap Coins", tools="hover", toolbar_location=None,
+            x_range=xfactors, y_range=yfactors)
+    plot.image(image=[data], color_mapper=color_mapper,
+               dh=[10], dw=[3.0], x=[0], y=[0])
+    color_bar = ColorBar(color_mapper=color_mapper, ticker= BasicTicker(),
+                         location=(0,0))
+    plot.add_layout(color_bar, 'right')
+    output_file("cryptoBokehCharts.html", title="crypto bokeh graphs")
+    show(column(plot,dot, sizing_mode="scale_height"))  # open a browser
+    print('charts updated')
+
+    time.sleep(60.0 - ((time.time() - starttime) % 60.0))
