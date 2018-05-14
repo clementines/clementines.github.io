@@ -7,10 +7,10 @@ import requests # web request library
 import re # regular expressions
 from bs4 import BeautifulSoup # HTML parsing library
 from bokeh.io import output_file, show
-from bokeh.layouts import column,row, gridplot, layout
+from bokeh.layouts import column, row, gridplot, layout
 from bokeh.plotting import figure
 from bokeh.palettes import Viridis3
-from bokeh.models import NumeralTickFormatter,LinearColorMapper, BasicTicker, ColorBar
+from bokeh.models import NumeralTickFormatter,LinearColorMapper, BasicTicker, ColorBar, LabelSet
 import time
 from selenium import webdriver
 import pandas.io.formats.excel # expose defaults for excel output headers
@@ -165,10 +165,11 @@ def histCoin(startDate,coinList): # dataframe - daily historical values from
     returnDFconcat = returnDFconcat.reset_index().sort_values(by=['Date','Market Cap'], ascending=[False, False])
     returnDFconcat = returnDFconcat.set_index(['Date','CoinID'])
     return {'df':returnDFconcat, 'meta':returnMeta}
-def forever(): # plotting delta with Bokeh - run every 60 seconds
+def forever(cmcHist): # plotting delta with Bokeh - run every 60 seconds
     print('beginning live chart update every 60 seconds')
     starttime=time.time()
     while True: # run every 60 seconds
+        output_file("cryptoBokehCharts.html", title="crypto bokeh graphs")
         newLive = liveCoin()
 
         # volume graph
@@ -187,34 +188,37 @@ def forever(): # plotting delta with Bokeh - run every 60 seconds
         yfactors = newLive['df'].loc[:,'percent_change_1h':'percent_change_7d'][0:10].index.tolist()
         yfactors.reverse()
         xfactors = ['Last Hour','Last 24 Hours','Last 7 Days']
-
         data = np.flipud(newLive['df'].loc[:,'percent_change_1h':'percent_change_7d'][0:10].values)
-        color_mapper = LinearColorMapper(palette="Viridis256", low=np.amin(data), high=np.amax(data))
+        color_mapper = LinearColorMapper(palette="Plasma256", low=np.amin(data), high=np.amax(data))
         plot = figure(title="Percent Change for Top 10 Market Cap Coins", tools="hover",
                 x_range=xfactors, y_range=yfactors)
         plot.image(image=[data], color_mapper=color_mapper,
                    dh=[10], dw=[3.0], x=[0], y=[0])
         color_bar = ColorBar(color_mapper=color_mapper, ticker= BasicTicker(),
                              location=(0,0))
+        # labels = LabelSet(x=xfactors, y=yfactors, text=yfactors, level='glyph',
+        #       x_offset=0, y_offset=0, render_mode='canvas')
+        # plot.add_layout(labels)
         plot.add_layout(color_bar, 'right')
 
-        #render graph
-        output_file("cryptoBokehCharts.html", title="crypto bokeh graphs")
-        arrangementC = column(plot,dot, sizing_mode='scale_height')
-        arrangementD = row(plot,dot, sizing_mode='scale_width')
+        # hist graph
+        volAgg = cmcHist['df']['Volume'].groupby('Date').sum()
+        timeList = volAgg.index.tolist()
+        volList = volAgg.values.tolist()
+        # cmcHist['df']['Volume'].unstack()
+        #colors = ['#%02x%02x%02x' % (r, g, 150) for r, g in zip(np.floor(50+2*x), np.floor(30+2*y))]
+        # hist = figure(title="Historical Values of Top 10 Coins", tools="hover", x_axis_type='datetime', x_range=timeList, y_range=volList)
+        hist = figure(title="Historical Total Volume of Top 100 Coins",
+                tools="hover, wheel_zoom, pan, lasso_select", x_axis_type='datetime')
+        hist.line(timeList, volList, line_color="orange")
+        hist.yaxis[0].formatter = NumeralTickFormatter(format='($ 0.00 a)')
 
-        # arrangment = gridplot(
-        #     children=[[plot, dot], [plot, dot]],
-        #     toolbar_location=None,
-        #     sizing_mode='fixed'
-        # )
-        arrangement = layout(
-            children=[
-                [arrangementC]
-            ],
-            sizing_mode='stretch_both'
-        )
-        show(arrangementC) # open a broweser
+        #render graph
+        l = layout([
+            [plot,dot],
+            [hist],
+        ], sizing_mode='stretch_both')
+        show(l) # open a broweser
         print('charts updated - waiting 60 seconds')
 
         time.sleep(60.0 - ((time.time() - starttime) % 60.0))
@@ -233,7 +237,7 @@ print(stop-start,' seconds for live API pull')
 
 # run webscrape pull and save as cmcHist
 start = timeit.default_timer()
-hist_start_date = '20120101'
+hist_start_date = '20140101'
 print('begin historical scrape from ',hist_start_date)
 cmcHist = histCoin(hist_start_date,coinList)
 # cmcHist = histCoin(hist_start_date,topten) # test
@@ -246,6 +250,25 @@ num_days_Hist = len(cmcHist['df'].index.get_level_values(0).unique())
 print('Live values: ',num_rows_Live, ' Coins')
 print('Historical values: ',num_days_Hist, ' Days for ',num_coins_Hist,' Coins')
 
+# testing historical graphs
+# num_rows_Hist = len(cmcHist['df'].index)
+# num_coins_Hist = len(cmcHist['df'].index.get_level_values(1).unique())
+# num_days_Hist = len(cmcHist['df'].index.get_level_values(0).unique())
+# cmcHist['df'].index
+# cmcHist['df'].columns
+# cmcHist['df']['Volume'].head()
+# volAgg = cmcHist['df']['Volume'].groupby('Date').sum()
+# timeList = volAgg.index.tolist()
+# volList = volAgg.values.tolist()
+# # cmcHist['df']['Volume'].unstack()
+# #colors = ['#%02x%02x%02x' % (r, g, 150) for r, g in zip(np.floor(50+2*x), np.floor(30+2*y))]
+#
+# # hist graphs
+# # hist = figure(title="Historical Values of Top 10 Coins", tools="hover", x_axis_type='datetime', x_range=timeList, y_range=volList)
+# hist = figure(title="Historical Volume of Top 10 Coins",
+#         tools="hover, wheel_zoom, pan", x_axis_type='datetime')
+# hist.line(timeList, volList)
+# show(hist)
 # create formatted excel workbooks of data
 start = timeit.default_timer()
 writeSimpleExcel(cmcLive,cmcHist)
@@ -253,7 +276,8 @@ writeExcel(cmcLive,cmcHist,'CryptoOutput.xlsx')
 stop =print(stop-start,' seconds for writing to excel')
 
 # hit live api, create html charts, open using bokeh.show - every 60 seconds
-forever()
+# use initial run version of historical data in every graph update
+forever(cmcHist)
 
 # # testing browser closing
 # from subprocess import Popen, check_call
