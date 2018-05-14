@@ -6,8 +6,10 @@ from datetime import date, datetime # date preprocessing library
 import requests # web request library
 import re # regular expressions
 from bs4 import BeautifulSoup # HTML parsing library
-from bokeh.layouts import column,row
-from bokeh.plotting import figure, show, output_file
+from bokeh.io import output_file, show
+from bokeh.layouts import column,row, gridplot, layout
+from bokeh.plotting import figure
+from bokeh.palettes import Viridis3
 from bokeh.models import NumeralTickFormatter,LinearColorMapper, BasicTicker, ColorBar
 import time
 from selenium import webdriver
@@ -174,7 +176,7 @@ def forever(): # plotting delta with Bokeh - run every 60 seconds
         x = newLive['df']['24h_volume_usd'].tolist()[0:10]
         factors.reverse()
         x.reverse()
-        dot = figure(title="24 Hour Volume for Top 10 Market Cap Coins", tools="hover", toolbar_location=None,
+        dot = figure(title="24 Hour Volume for Top 10 Market Cap Coins", tools="hover",
                     y_range=factors, x_range=[0,max(x)])
         dot.segment(0, factors, x, factors, line_width=2, line_color="green", )
         dot.circle(x, factors, size=15, fill_color="orange", line_color="green", line_width=3, )
@@ -188,15 +190,31 @@ def forever(): # plotting delta with Bokeh - run every 60 seconds
 
         data = np.flipud(newLive['df'].loc[:,'percent_change_1h':'percent_change_7d'][0:10].values)
         color_mapper = LinearColorMapper(palette="Viridis256", low=np.amin(data), high=np.amax(data))
-        plot = figure(title="Percent Change for Top 10 Market Cap Coins", tools="hover", toolbar_location=None,
+        plot = figure(title="Percent Change for Top 10 Market Cap Coins", tools="hover",
                 x_range=xfactors, y_range=yfactors)
         plot.image(image=[data], color_mapper=color_mapper,
                    dh=[10], dw=[3.0], x=[0], y=[0])
         color_bar = ColorBar(color_mapper=color_mapper, ticker= BasicTicker(),
                              location=(0,0))
         plot.add_layout(color_bar, 'right')
+
+        #render graph
         output_file("cryptoBokehCharts.html", title="crypto bokeh graphs")
-        show(column(plot,dot, sizing_mode="scale_height"))  # open a browser
+        arrangementC = column(plot,dot, sizing_mode='scale_height')
+        arrangementD = row(plot,dot, sizing_mode='scale_width')
+
+        # arrangment = gridplot(
+        #     children=[[plot, dot], [plot, dot]],
+        #     toolbar_location=None,
+        #     sizing_mode='fixed'
+        # )
+        arrangement = layout(
+            children=[
+                [arrangementC]
+            ],
+            sizing_mode='stretch_both'
+        )
+        show(arrangementC) # open a broweser
         print('charts updated - waiting 60 seconds')
 
         time.sleep(60.0 - ((time.time() - starttime) % 60.0))
@@ -215,9 +233,10 @@ print(stop-start,' seconds for live API pull')
 
 # run webscrape pull and save as cmcHist
 start = timeit.default_timer()
-hist_start_date = '20180101'
+hist_start_date = '20120101'
 print('begin historical scrape from ',hist_start_date)
 cmcHist = histCoin(hist_start_date,coinList)
+# cmcHist = histCoin(hist_start_date,topten) # test
 stop = timeit.default_timer()
 print(stop-start,' seconds for historical scrape from ',hist_start_date)
 num_rows_Live = len(cmcLive['df'].index)
@@ -236,7 +255,14 @@ stop =print(stop-start,' seconds for writing to excel')
 # hit live api, create html charts, open using bokeh.show - every 60 seconds
 forever()
 
-## testing selenium
+# # testing browser closing
+# from subprocess import Popen, check_call
+# p1 = Popen('start C:/Users/Yuri/Documents/GitHub/clementines.github.io/cryptoBokehCharts.html',shell=True)
+# time.sleep(60)
+# for pid in [p1.pid]:
+#     check_call(['taskkill', '/F', '/T', '/PID', str(pid)])
+
+# # testing selenium
 # print('testing selenium')
 # dr = webdriver.Edge()
 # dr.get('http://stackoverflow.com/')
