@@ -7,12 +7,11 @@ import requests # web request library
 import re # regular expressions
 from bs4 import BeautifulSoup # HTML parsing library
 from bokeh.io import output_file, show
-from bokeh.layouts import column, row, gridplot, layout
+from bokeh.layouts import layout
 from bokeh.plotting import figure
-from bokeh.palettes import Viridis3
-from bokeh.models import NumeralTickFormatter,LinearColorMapper, BasicTicker, ColorBar, LabelSet
+from bokeh.palettes import Plasma256
+from bokeh.models import NumeralTickFormatter,LinearColorMapper, BasicTicker, ColorBar
 import time
-from selenium import webdriver
 import pandas.io.formats.excel # expose defaults for excel output headers
 pandas.io.formats.excel.header_style = None # delete original header formatting
 
@@ -177,7 +176,7 @@ def forever(cmcHist): # plotting delta with Bokeh - run every 60 seconds
         x = newLive['df']['24h_volume_usd'].tolist()[0:10]
         factors.reverse()
         x.reverse()
-        dot = figure(title="24 Hour Volume for Top 10 Market Cap Coins", tools="hover",
+        dot = figure(title="24 Hour Volume per Coin for Top 10 Coins by Market Cap", tools="hover",
                     y_range=factors, x_range=[0,max(x)])
         dot.segment(0, factors, x, factors, line_width=2, line_color="green", )
         dot.circle(x, factors, size=15, fill_color="orange", line_color="green", line_width=3, )
@@ -190,7 +189,7 @@ def forever(cmcHist): # plotting delta with Bokeh - run every 60 seconds
         xfactors = ['Last Hour','Last 24 Hours','Last 7 Days']
         data = np.flipud(newLive['df'].loc[:,'percent_change_1h':'percent_change_7d'][0:10].values)
         color_mapper = LinearColorMapper(palette="Plasma256", low=np.amin(data), high=np.amax(data))
-        plot = figure(title="Percent Change for Top 10 Market Cap Coins", tools="hover",
+        plot = figure(title="Percent Change per Coin for Top 10 Coins by Market Cap", tools="hover",
                 x_range=xfactors, y_range=yfactors)
         plot.image(image=[data], color_mapper=color_mapper,
                    dh=[10], dw=[3.0], x=[0], y=[0])
@@ -205,18 +204,38 @@ def forever(cmcHist): # plotting delta with Bokeh - run every 60 seconds
         volAgg = cmcHist['df']['Volume'].groupby('Date').sum()
         timeList = volAgg.index.tolist()
         volList = volAgg.values.tolist()
-        # cmcHist['df']['Volume'].unstack()
-        #colors = ['#%02x%02x%02x' % (r, g, 150) for r, g in zip(np.floor(50+2*x), np.floor(30+2*y))]
-        # hist = figure(title="Historical Values of Top 10 Coins", tools="hover", x_axis_type='datetime', x_range=timeList, y_range=volList)
-        hist = figure(title="Historical Total Volume of Top 100 Coins",
-                tools="hover, wheel_zoom, pan, lasso_select", x_axis_type='datetime')
+        hist = figure(title="Total Daily Volume of Top 100 Coins by Market Cap",
+                tools="hover, wheel_zoom, pan, lasso_select, reset", x_axis_type='datetime')
         hist.line(timeList, volList, line_color="orange")
         hist.yaxis[0].formatter = NumeralTickFormatter(format='($ 0.00 a)')
+
+        # val graph
+        dailyValByCoin = cmcHist['df']['Close'].unstack(0)
+        dailyValByCoin.head()
+        len(dailyValByCoin.columns)
+        timeList = dailyValByCoin.columns.tolist()
+        valList = dailyValByCoin.values.tolist()
+        coinList = dailyValByCoin.index.tolist()
+        listOftimeList = []
+        for val in valList:
+            listOftimeList.append(timeList)
+        len(timeList)
+        len(valList)
+        len(listOftimeList)
+        val = figure(title="Daily Value per Coin of Top 100 Coins by Market Cap",
+                tools="hover, wheel_zoom, pan, lasso_select, reset", x_axis_type='datetime',
+                x_range=hist.x_range)
+        val.multi_line(xs=listOftimeList, ys=valList
+                ,line_color=Plasma256[0:len(listOftimeList)]
+                # ,legend=coinList #not accepting this arg
+                )
+        val.yaxis[0].formatter = NumeralTickFormatter(format='$ 0,0[.]00')
 
         #render graph
         l = layout([
             [plot,dot],
-            [hist],
+            [val],
+            [hist]
         ], sizing_mode='stretch_both')
         show(l) # open a broweser
         print('charts updated - waiting 60 seconds')
@@ -237,7 +256,7 @@ print(stop-start,' seconds for live API pull')
 
 # run webscrape pull and save as cmcHist
 start = timeit.default_timer()
-hist_start_date = '20140101'
+hist_start_date = '20160101'
 print('begin historical scrape from ',hist_start_date)
 cmcHist = histCoin(hist_start_date,coinList)
 # cmcHist = histCoin(hist_start_date,topten) # test
@@ -250,25 +269,6 @@ num_days_Hist = len(cmcHist['df'].index.get_level_values(0).unique())
 print('Live values: ',num_rows_Live, ' Coins')
 print('Historical values: ',num_days_Hist, ' Days for ',num_coins_Hist,' Coins')
 
-# testing historical graphs
-# num_rows_Hist = len(cmcHist['df'].index)
-# num_coins_Hist = len(cmcHist['df'].index.get_level_values(1).unique())
-# num_days_Hist = len(cmcHist['df'].index.get_level_values(0).unique())
-# cmcHist['df'].index
-# cmcHist['df'].columns
-# cmcHist['df']['Volume'].head()
-# volAgg = cmcHist['df']['Volume'].groupby('Date').sum()
-# timeList = volAgg.index.tolist()
-# volList = volAgg.values.tolist()
-# # cmcHist['df']['Volume'].unstack()
-# #colors = ['#%02x%02x%02x' % (r, g, 150) for r, g in zip(np.floor(50+2*x), np.floor(30+2*y))]
-#
-# # hist graphs
-# # hist = figure(title="Historical Values of Top 10 Coins", tools="hover", x_axis_type='datetime', x_range=timeList, y_range=volList)
-# hist = figure(title="Historical Volume of Top 10 Coins",
-#         tools="hover, wheel_zoom, pan", x_axis_type='datetime')
-# hist.line(timeList, volList)
-# show(hist)
 # create formatted excel workbooks of data
 start = timeit.default_timer()
 writeSimpleExcel(cmcLive,cmcHist)
@@ -311,3 +311,4 @@ forever(cmcHist)
     # ws1
     # ws1['P2'] = 0.00
     # wb.save('CryptoOutput.xlsx')
+## name, action
