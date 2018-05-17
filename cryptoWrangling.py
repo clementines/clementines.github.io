@@ -8,9 +8,10 @@ import re # regular expressions
 from bs4 import BeautifulSoup # HTML parsing library
 from bokeh.io import output_file, show
 from bokeh.layouts import layout
-from bokeh.plotting import figure
-from bokeh.palettes import Plasma256
-from bokeh.models import NumeralTickFormatter,LinearColorMapper, BasicTicker, ColorBar
+from bokeh.plotting import figure, ColumnDataSource
+from bokeh.palettes import Plasma256, Category10
+from bokeh.models import NumeralTickFormatter,LinearColorMapper,BasicTicker,ColorBar
+
 import time
 import pandas.io.formats.excel # expose defaults for excel output headers
 pandas.io.formats.excel.header_style = None # delete original header formatting
@@ -164,7 +165,7 @@ def histCoin(startDate,coinList): # dataframe - daily historical values from
     returnDFconcat = returnDFconcat.reset_index().sort_values(by=['Date','Market Cap'], ascending=[False, False])
     returnDFconcat = returnDFconcat.set_index(['Date','CoinID'])
     return {'df':returnDFconcat, 'meta':returnMeta}
-def forever(cmcHist): # plotting delta with Bokeh - run every 60 seconds
+def forever(cmcHist,topten): # plotting delta with Bokeh - run every 60 seconds
     print('beginning live chart update every 60 seconds')
     starttime=time.time()
     while True: # run every 60 seconds
@@ -180,7 +181,6 @@ def forever(cmcHist): # plotting delta with Bokeh - run every 60 seconds
                     y_range=factors, x_range=[0,max(x)])
         dot.segment(0, factors, x, factors, line_width=2, line_color="green", )
         dot.circle(x, factors, size=15, fill_color="orange", line_color="green", line_width=3, )
-        # dot.ticker = SingleIntervalTicker(interval=max(x)/5, num_minor_ticks=5)
         dot.xaxis[0].formatter = NumeralTickFormatter(format='($ 0.00 a)')
 
         # delta graph
@@ -211,25 +211,27 @@ def forever(cmcHist): # plotting delta with Bokeh - run every 60 seconds
 
         # val graph
         dailyValByCoin = cmcHist['df']['Close'].unstack(0)
-        dailyValByCoin.head()
-        len(dailyValByCoin.columns)
+        dailyValByCoin = dailyValByCoin.loc[topten]
         timeList = dailyValByCoin.columns.tolist()
         valList = dailyValByCoin.values.tolist()
         coinList = dailyValByCoin.index.tolist()
         listOftimeList = []
         for val in valList:
             listOftimeList.append(timeList)
-        len(timeList)
-        len(valList)
-        len(listOftimeList)
-        val = figure(title="Daily Value per Coin of Top 100 Coins by Market Cap",
+        data = {'xs':listOftimeList,
+                'ys': valList,
+                'labels': coinList,
+                'line_color': Category10[10]}
+        source = ColumnDataSource(data)
+        val = figure(title="Daily Value per Coin of Top 10 Coins by Market Cap",
                 tools="hover, wheel_zoom, pan, lasso_select, reset", x_axis_type='datetime',
                 x_range=hist.x_range)
-        val.multi_line(xs=listOftimeList, ys=valList
-                ,line_color=Plasma256[0:len(listOftimeList)]
-                # ,legend=coinList #not accepting this arg
-                )
+        val.multi_line(xs='xs', ys='ys'
+                ,legend='labels'
+                ,line_color='line_color'
+                ,source=source)
         val.yaxis[0].formatter = NumeralTickFormatter(format='$ 0,0[.]00')
+        val.legend.location = "top_left"
 
         #render graph
         l = layout([
@@ -277,7 +279,7 @@ stop =print(stop-start,' seconds for writing to excel')
 
 # hit live api, create html charts, open using bokeh.show - every 60 seconds
 # use initial run version of historical data in every graph update
-forever(cmcHist)
+forever(cmcHist, topten)
 
 # # testing browser closing
 # from subprocess import Popen, check_call
