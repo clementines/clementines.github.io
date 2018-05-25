@@ -150,10 +150,10 @@ def histCoin(startDate,coinList): # dataframe - daily historical values from
         returnDF['Date'] = returnDF.apply(cleanDate, axis=1)
         returnDF['Volume'] = returnDF.apply(noComma1, axis=1)
         returnDF['Market Cap'] = returnDF.apply(noComma2, axis=1)
-        returnDF['Open'] = pd.to_numeric(returnDF['Open'])
+        returnDF['Open'] = pd.to_numeric(returnDF['Open*'])
         returnDF['High'] = pd.to_numeric(returnDF['High'])
         returnDF['Low'] = pd.to_numeric(returnDF['Low'])
-        returnDF['Close'] = pd.to_numeric(returnDF['Close'])
+        returnDF['Close'] = pd.to_numeric(returnDF['Close**'])
         returnDF['Volume'] = pd.to_numeric(returnDF['Volume'], errors='coerce')
         returnDF['Market Cap'] = pd.to_numeric(returnDF['Market Cap'], errors='coerce')
         returnDF['CoinID'] = x
