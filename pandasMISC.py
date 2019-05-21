@@ -1,3 +1,7 @@
+import pandas as pd # data munging library
+import numpy as np # data munging library
+from datetime import date, datetime # date preprocessing library
+
 # PANDAS MISC #################################
 # create 4 by 4 matrix with random numbers
 def randTSDF():
@@ -8,14 +12,15 @@ def randTSDF():
 # to numpy 2-d array
 df = randTSDF()
 df
+print(df)
 df.index
 df.values
+df.shape
 # axis 1 is column header, descending: ascending=False
 df.sort_index(axis=0, ascending=True)
 df.sort_index(axis=1, ascending=False)
 df.sort_values(by='B')
-cmc = cmc.sort_values(by='rank')
-cmc
+
 # graph percent_change_7d, percent_change_24h, percent_change_1h (significance hiearchy), order by market_cap_usd
 
 df
@@ -36,7 +41,6 @@ df.shape[0]
 df.index
 df.index[0]
 df[df.index[0]]
-df[E] =
 
 df2 = df.copy()
 df2
@@ -81,3 +85,27 @@ df2Cut = df2[df2['E'].isin(['two','four'])]
 df
 df.apply(np.cumsum)
 df.apply(lambda x: x.max() - x.min()).values
+
+#############################cryptoWrangling.py MISC###########################################
+
+returnDF.dtypes
+
+returnDF['isDate'] = None
+for index, row in returnDF.iterrows():
+    try:
+        row['isDate'] = True
+        datetime.strptime(row['Date'].replace(',',''),'%b %d %Y')
+    except ValueError:
+      	row['isDate'] = False
+    print (row['Date'], row['isDate'])
+
+returnDF = returnDF[returnDF['isDate'] == True]
+returnDF.drop('isDate', axis=1, inplace=True)
+returnDF.head()
+returnDF.tail()
+
+returnDFList
+returnDFList.tail()
+
+coinList
+topten

@@ -46,8 +46,10 @@ def noComma1(row): # remove comma from column 'Volume'
     return row['Volume'].replace(',','')
 def noComma2(row): # remove comma from column 'Market Cap'
     return row['Market Cap'].replace(',','')
-def cleanDate(row): # remove comma from string 'Date' field - cast as Date
-    return datetime.strptime(row['Date'].replace(',',''),'%b %d %Y')
+def noComma3(row): # remove comma from column 'Date'
+    return row['Date'].replace(',','')    
+def cleanDate(row): # cast as Date
+    return datetime.strptime(row['Date'],'%b %d %Y')
 def prior_1h(row):
     return row['price_usd']/((100 - row['percent_change_1h'])/100)
 def prior_24h(row):
@@ -136,6 +138,9 @@ def liveCoin(): # dataframe - live crypto values for top 100 market cap
     return {'df':returnDF, 'meta':returnMeta}
 def histCoin(startDate,coinList): # dataframe - daily historical values from
         # startDate for coin ID in coinList ('YYYYMMDD', ['bitcoin','litecoin'])
+    # startDate = hist_start_date # test init
+    # coinList = topten # test init
+    # x = 'bitcoin' # test init
     today = date.today()
     todayString = today.strftime('%Y%m%d')
     returnDFList = []
@@ -147,6 +152,18 @@ def histCoin(startDate,coinList): # dataframe - daily historical values from
         returnMeta = pd.DataFrame([meta]).T
         soup = BeautifulSoup(r.content, 'html.parser')
         returnDF = parseHTMLTable(soup)
+        returnDF['isDate'] = None
+        for index, row in returnDF.iterrows():
+            try:
+                row['isDate'] = True
+                datetime.strptime(row['Date'].replace(',',''),'%b %d %Y')
+            except ValueError:
+      	        row['isDate'] = False
+            # print (row['Date'], row['isDate'])
+        # returnDF[returnDF['isDate'] == True]
+        returnDF = returnDF[returnDF['isDate'] == True]
+        returnDF.drop('isDate', axis=1, inplace=True)
+        returnDF['Date'] = returnDF.apply(noComma3, axis=1)
         returnDF['Date'] = returnDF.apply(cleanDate, axis=1)
         returnDF['Volume'] = returnDF.apply(noComma1, axis=1)
         returnDF['Market Cap'] = returnDF.apply(noComma2, axis=1)
