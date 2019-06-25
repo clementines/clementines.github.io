@@ -277,8 +277,10 @@ print(stop-start,' seconds for live API pull')
 start = timeit.default_timer()
 hist_start_date = '20160101'
 print('begin historical scrape from ',hist_start_date)
-# cmcHist = histCoin(hist_start_date,coinList) # list size of 100 failing
-cmcHist = histCoin(hist_start_date,topten) # test
+# cmcHist = histCoin(hist_start_date,coinList) # list size of 100 failing on date processing
+cmcHist = histCoin(hist_start_date,topten) # list of top ten coins
+# topten
+# coinList
 stop = timeit.default_timer()
 print(stop-start,' seconds for historical scrape from ',hist_start_date)
 num_rows_Live = len(cmcLive['df'].index)
