@@ -109,3 +109,58 @@ returnDFList.tail()
 
 coinList
 topten
+
+#############################cryptoWrangling.py DEBUG###########################################
+
+cmcHist = histCoin(hist_start_date,topten)
+
+topone = []
+topone.append(topten[0])
+
+today = date.today()
+todayString = today.strftime('%Y%m%d')
+returnDFList = []
+for x in topone: # run for every coin ID specified 
+    print('scraping '+x+ ' historical')
+    coin_hist_link = 'https://coinmarketcap.com/currencies/'+x+'/historical-data/?start='+hist_start_date+'&end='+todayString
+    r = requests.get(coin_hist_link)
+    meta = r.headers
+    returnMeta = pd.DataFrame([meta]).T
+    soup = BeautifulSoup(r.content, 'html.parser')
+    returnDF = parseHTMLTable(soup)
+    returnDF['isDate'] = None
+    print(returnDF.describe())
+    print(returnDF.dtypes)
+    for index, row in returnDF.iterrows():
+        try:
+            row['isDate'] = True
+            # datetime.strptime(row['Date'].replace(',',''),'%b %d %Y')
+            datetime.strptime(row['Date'],'%b %d %Y')
+            print(datetime.strptime(row['Date'],'%b %d %Y'))
+        except TypeError:
+            row['isDate'] = False
+        print(row['Date'], row['isDate'])
+        
+    # returnDF[returnDF['isDate'] == True]
+    returnDF = returnDF[returnDF['isDate'] == True]
+    returnDF.drop('isDate', axis=1, inplace=True)
+    returnDF['Date'] = returnDF.apply(noComma3, axis=1)
+    returnDF['Date'] = returnDF.apply(cleanDate, axis=1)
+    returnDF['Volume'] = returnDF.apply(noComma1, axis=1)
+    returnDF['Market Cap'] = returnDF.apply(noComma2, axis=1)
+    returnDF['Open'] = pd.to_numeric(returnDF['Open*'])
+    returnDF['High'] = pd.to_numeric(returnDF['High'])
+    returnDF['Low'] = pd.to_numeric(returnDF['Low'])
+    returnDF['Close'] = pd.to_numeric(returnDF['Close**'])
+    returnDF['Volume'] = pd.to_numeric(returnDF['Volume'], errors='coerce')
+    returnDF['Market Cap'] = pd.to_numeric(returnDF['Market Cap'], errors='coerce')
+    returnDF['CoinID'] = x
+    returnDF = returnDF.set_index(['Date','CoinID'])
+    print('saving '+x+ ' historical')
+    returnDFList.append(returnDF)
+print('combining all historical')
+returnDFconcat = pd.concat(returnDFList) # combine all dataframes into one
+returnDFconcat = returnDFconcat.reset_index().sort_values(by=['Date','Market Cap'], ascending=[False, False])
+returnDFconcat = returnDFconcat.set_index(['Date','CoinID'])
+return {'df':returnDFconcat, 'meta':returnMeta}
+

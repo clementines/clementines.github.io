@@ -137,7 +137,7 @@ def liveCoin(): # dataframe - live crypto values for top 100 market cap
     print('saving live coin data')
     return {'df':returnDF, 'meta':returnMeta}
 def histCoin(startDate,coinList): # dataframe - daily historical values from
-        # startDate for coin ID in coinList ('YYYYMMDD', ['bitcoin','litecoin'])
+    # startDate for coin ID in coinList ('YYYYMMDD', ['bitcoin','litecoin'])
     # startDate = hist_start_date # test init
     # coinList = topten # test init
     # x = 'bitcoin' # test init
