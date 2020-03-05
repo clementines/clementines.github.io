@@ -128,18 +128,26 @@ for x in topone: # run for every coin ID specified
     returnMeta = pd.DataFrame([meta]).T
     soup = BeautifulSoup(r.content, 'html.parser')
     returnDF = parseHTMLTable(soup)
-    returnDF['isDate'] = None
+    returnDF = returnDF.dropna()
+    # returnDF['isDate'] = None
     print(returnDF.describe())
     print(returnDF.dtypes)
+    print(datetime.strptime(returnDF['Date'],'%b %d %Y'))
+    returnDF['Date'] = returnDF['Date'].apply(lambda x: x.string.replace(',',''))
+    returnDF['Date'] = returnDF['Date'].apply(lambda x: datetime.strptime(x,'%b %d %Y'))
+    
     for index, row in returnDF.iterrows():
         try:
             row['isDate'] = True
             # datetime.strptime(row['Date'].replace(',',''),'%b %d %Y')
             datetime.strptime(row['Date'],'%b %d %Y')
             print(datetime.strptime(row['Date'],'%b %d %Y'))
+            soupT = BeautifulSoup(row['Date'])
+            div = soupT.find('div')
+            print(row['Date'], row['isDate'], div.contents)
         except TypeError:
             row['isDate'] = False
-        print(row['Date'], row['isDate'])
+            print(row['Date'], row['isDate'])
         
     # returnDF[returnDF['isDate'] == True]
     returnDF = returnDF[returnDF['isDate'] == True]

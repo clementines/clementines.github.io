@@ -42,14 +42,14 @@ def flatten(l): # flatten list of lists into a list
     lists_of_lists = l
     flattened = [val for sublist in lists_of_lists for val in sublist]
     return flattened
-def noComma1(row): # remove comma from column 'Volume'
-    return row['Volume'].replace(',','')
-def noComma2(row): # remove comma from column 'Market Cap'
-    return row['Market Cap'].replace(',','')
-def noComma3(row): # remove comma from column 'Date'
-    return row['Date'].replace(',','')    
-def cleanDate(row): # cast as Date
-    return datetime.strptime(row['Date'],'%b %d %Y')
+# def noComma1(row): # remove comma from column 'Volume'
+#     return row['Volume'].replace(',','')
+# def noComma2(row): # remove comma from column 'Market Cap'
+#     return row['Market Cap'].replace(',','')
+# def noComma3(row): # remove comma from column 'Date'
+#     return row['Date'].replace(',','')    
+# def cleanDate(row): # cast as Date
+#     return datetime.strptime(row['Date'],'%b %d %Y')
 def prior_1h(row):
     return row['price_usd']/((100 - row['percent_change_1h'])/100)
 def prior_24h(row):
@@ -152,21 +152,25 @@ def histCoin(startDate,coinList): # dataframe - daily historical values from
         returnMeta = pd.DataFrame([meta]).T
         soup = BeautifulSoup(r.content, 'html.parser')
         returnDF = parseHTMLTable(soup)
-        returnDF['isDate'] = None
-        for index, row in returnDF.iterrows():
-            try:
-                row['isDate'] = True
-                datetime.strptime(row['Date'].replace(',',''),'%b %d %Y')
-            except ValueError:
-      	        row['isDate'] = False
-            # print (row['Date'], row['isDate'])
-        # returnDF[returnDF['isDate'] == True]
-        returnDF = returnDF[returnDF['isDate'] == True]
-        returnDF.drop('isDate', axis=1, inplace=True)
-        returnDF['Date'] = returnDF.apply(noComma3, axis=1)
-        returnDF['Date'] = returnDF.apply(cleanDate, axis=1)
-        returnDF['Volume'] = returnDF.apply(noComma1, axis=1)
-        returnDF['Market Cap'] = returnDF.apply(noComma2, axis=1)
+        returnDF = returnDF.dropna()
+        returnDF['Date'] = returnDF['Date'].apply(lambda x: x.string.replace(',',''))
+        returnDF['Date'] = returnDF['Date'].apply(lambda x: datetime.strptime(x,'%b %d %Y'))
+        # returnDF['isDate'] = None
+        # for index, row in returnDF.iterrows():
+        #     try:
+        #         row['isDate'] = True
+        #         datetime.strptime(row['Date'].replace(',',''),'%b %d %Y')
+        #     except ValueError:
+      	#         row['isDate'] = False
+        #     # print (row['Date'], row['isDate'])
+        # # returnDF[returnDF['isDate'] == True]
+        # returnDF = returnDF[returnDF['isDate'] == True]
+        # returnDF.drop('isDate', axis=1, inplace=True)
+        # returnDF['Date'] = returnDF.apply(noComma3, axis=1)
+        # returnDF['Date'] = returnDF.apply(cleanDate, axis=1)
+        print(returnDF)
+        returnDF['Volume'] = returnDF['Volume'].apply(lambda x: x.string.replace(',',''))
+        returnDF['Market Cap'] = returnDF['Market Cap'].apply(lambda x: x.string.replace(',',''))
         returnDF['Open'] = pd.to_numeric(returnDF['Open*'])
         returnDF['High'] = pd.to_numeric(returnDF['High'])
         returnDF['Low'] = pd.to_numeric(returnDF['Low'])
